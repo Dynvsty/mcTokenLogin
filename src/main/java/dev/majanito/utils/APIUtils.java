@@ -2,7 +2,7 @@ package dev.majanito.utils;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -44,7 +44,7 @@ public class APIUtils {
 
             UUID uuid = UUID.fromString(uuidString);
 
-            return ign.equals(MinecraftClient.getInstance().getSession().getUsername()) && uuid.equals(MinecraftClient.getInstance().getSession().getUuidOrNull());
+            return ign.equals(Minecraft.getInstance().getUser().getName()) && uuid.equals(Minecraft.getInstance().getUser().getProfileId());
         } catch (Exception e) {
             return false;
         }

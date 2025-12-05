@@ -3,27 +3,27 @@ package dev.majanito.screens;
 import dev.majanito.SessionIDLoginMod;
 import dev.majanito.utils.APIUtils;
 import dev.majanito.utils.SessionUtils;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.input.CharInput;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 public class EditAccountScreen extends Screen {
-    private TextFieldWidget nameField;
-    private TextFieldWidget skinUrlField;
-    private ButtonWidget nameButton;
-    private ButtonWidget skinButton;
-    private Text currentTitle;
+    private EditBox nameField;
+    private EditBox skinUrlField;
+    private Button nameButton;
+    private Button skinButton;
+    private Component currentTitle;
 
     public EditAccountScreen() {
-        super(Text.literal(""));
-        this.currentTitle = Text.literal("Edit Account").formatted(Formatting.AQUA);
+        super(Component.literal(""));
+        this.currentTitle = Component.literal("Edit Account").withStyle(ChatFormatting.AQUA);
     }
 
     @Override
@@ -31,95 +31,95 @@ public class EditAccountScreen extends Screen {
         int centerX = this.width / 2;
         int centerY = this.height / 2;
 
-        nameField = new TextFieldWidget(this.textRenderer, centerX - 100, centerY - 40, 200, 20, Text.literal("New Username"));
+        nameField = new EditBox(this.font, centerX - 100, centerY - 40, 200, 20, Component.literal("New Username"));
         nameField.setMaxLength(16);
         nameField.setFocused(true);
-        this.addSelectableChild(nameField);
+        this.addWidget(nameField);
 
-        skinUrlField = new TextFieldWidget(this.textRenderer, centerX - 100, centerY, 200, 20, Text.literal("Skin URL"));
+        skinUrlField = new EditBox(this.font, centerX - 100, centerY, 200, 20, Component.literal("Skin URL"));
         skinUrlField.setMaxLength(2048);
-        this.addSelectableChild(skinUrlField);
+        this.addWidget(skinUrlField);
 
-        nameButton = ButtonWidget.builder(Text.literal("Change Name"), button -> {
-            String newName = nameField.getText().trim();
+        nameButton = Button.builder(Component.literal("Change Name"), button -> {
+            String newName = nameField.getValue().trim();
             if (!newName.isEmpty()) {
                 if (newName.matches("^[a-zA-Z0-9_]{3,16}$")) {
                     int statusCode = APIUtils.changeName(newName, SessionIDLoginMod.currentSession.getAccessToken());
                     currentTitle = switch (statusCode) {
                         case 200 -> {
-                            SessionIDLoginMod.currentSession = SessionUtils.createSession(newName, SessionIDLoginMod.currentSession.getUuidOrNull(), SessionIDLoginMod.currentSession.getAccessToken());
-                            yield Text.literal("Successfully changed name").formatted(Formatting.GREEN);
+                            SessionIDLoginMod.currentSession = SessionUtils.createSession(newName, SessionIDLoginMod.currentSession.getProfileId(), SessionIDLoginMod.currentSession.getAccessToken());
+                            yield Component.literal("Successfully changed name").withStyle(ChatFormatting.GREEN);
                         }
-                        case 429 -> Text.literal("Too many requests").formatted(Formatting.RED);
-                        case 400 -> Text.literal("Invalid name").formatted(Formatting.RED);
-                        case 401 -> Text.literal("Invalid token").formatted(Formatting.RED);
-                        case 403 -> Text.literal("Name is unavailable or Player already changed name in the last 35 days").formatted(Formatting.RED);
-                        default -> Text.literal("Unknown error").formatted(Formatting.RED);
+                        case 429 -> Component.literal("Too many requests").withStyle(ChatFormatting.RED);
+                        case 400 -> Component.literal("Invalid name").withStyle(ChatFormatting.RED);
+                        case 401 -> Component.literal("Invalid token").withStyle(ChatFormatting.RED);
+                        case 403 -> Component.literal("Name is unavailable or Player already changed name in the last 35 days").withStyle(ChatFormatting.RED);
+                        default -> Component.literal("Unknown error").withStyle(ChatFormatting.RED);
                     };
 
                 } else
-                    currentTitle = Text.literal("Invalid name").formatted(Formatting.RED);
+                    currentTitle = Component.literal("Invalid name").withStyle(ChatFormatting.RED);
             } else
-                currentTitle = Text.literal("Please input a name").formatted(Formatting.RED);
-        }).dimensions(centerX - 100, centerY + 25, 97, 20).build();
-        this.addDrawableChild(nameButton);
+                currentTitle = Component.literal("Please input a name").withStyle(ChatFormatting.RED);
+        }).bounds(centerX - 100, centerY + 25, 97, 20).build();
+        this.addRenderableWidget(nameButton);
 
-        skinButton = ButtonWidget.builder(Text.literal("Change Skin"), button -> {
-            String skinUrl = skinUrlField.getText().trim();
+        skinButton = Button.builder(Component.literal("Change Skin"), button -> {
+            String skinUrl = skinUrlField.getValue().trim();
             if (!skinUrl.isEmpty()) {
                 int statusCode = APIUtils.changeSkin(skinUrl, SessionIDLoginMod.currentSession.getAccessToken());
                 currentTitle = switch (statusCode) {
-                    case 200 -> Text.literal("Successfully changed skin").formatted(Formatting.GREEN);
-                    case 429 -> Text.literal("Too many requests").formatted(Formatting.RED);
-                    case 401 -> Text.literal("Invalid token").formatted(Formatting.RED);
-                    case -1 -> Text.literal("Unknown error").formatted(Formatting.RED);
-                    default -> Text.literal("Invalid Skin").formatted(Formatting.RED);
+                    case 200 -> Component.literal("Successfully changed skin").withStyle(ChatFormatting.GREEN);
+                    case 429 -> Component.literal("Too many requests").withStyle(ChatFormatting.RED);
+                    case 401 -> Component.literal("Invalid token").withStyle(ChatFormatting.RED);
+                    case -1 -> Component.literal("Unknown error").withStyle(ChatFormatting.RED);
+                    default -> Component.literal("Invalid Skin").withStyle(ChatFormatting.RED);
                 };
             } else
-                currentTitle = Text.literal("Please input an URL").formatted(Formatting.RED);
-        }).dimensions(centerX + 3, centerY + 25, 97, 20).build();
-        this.addDrawableChild(skinButton);
+                currentTitle = Component.literal("Please input an URL").withStyle(ChatFormatting.RED);
+        }).bounds(centerX + 3, centerY + 25, 97, 20).build();
+        this.addRenderableWidget(skinButton);
 
-        ButtonWidget backButton = ButtonWidget.builder(Text.literal("Back"), button -> {
-            assert this.client != null;
-            this.client.setScreen(new net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen(new TitleScreen()));
-        }).dimensions(centerX - 100, centerY + 50, 200, 20).build();
+        Button backButton = Button.builder(Component.literal("Back"), button -> {
+            assert this.minecraft != null;
+            this.minecraft.setScreen(new net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen(new TitleScreen()));
+        }).bounds(centerX - 100, centerY + 50, 200, 20).build();
 
-        this.addDrawableChild(backButton);
+        this.addRenderableWidget(backButton);
 
         if (SessionIDLoginMod.originalSession.equals(SessionIDLoginMod.currentSession)) {
             nameButton.active = false;
             skinButton.active = false;
 
-            currentTitle = Text.literal("To enable this, you MUST first sign in with a token!").formatted(Formatting.YELLOW);
+            currentTitle = Component.literal("To enable this, you MUST first sign in with a token!").withStyle(ChatFormatting.YELLOW);
         }
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
-        context.drawTextWithShadow(this.textRenderer, Text.literal("Username:"), this.width / 2 - 100, this.height / 2 - 52, 0xA0A0A0FF);
+        context.drawString(this.font, Component.literal("Username:"), this.width / 2 - 100, this.height / 2 - 52, 0xA0A0A0FF);
         nameField.render(context, mouseX, mouseY, delta);
 
-        context.drawTextWithShadow(this.textRenderer, Text.literal("Skin URL:"), this.width / 2 - 100, this.height / 2 - 10, 0xA0A0A0FF);
+        context.drawString(this.font, Component.literal("Skin URL:"), this.width / 2 - 100, this.height / 2 - 10, 0xA0A0A0FF);
         skinUrlField.render(context, mouseX, mouseY, delta);
 
-        context.drawCenteredTextWithShadow(this.textRenderer, this.currentTitle, this.width / 2, this.height / 2 - 75, 0xFFFFFFFF);
+        context.drawCenteredString(this.font, this.currentTitle, this.width / 2, this.height / 2 - 75, 0xFFFFFFFF);
     }
 
     @Override
-    public boolean keyPressed(KeyInput keyInput) {
+    public boolean keyPressed(KeyEvent keyInput) {
         return nameField.keyPressed(keyInput) || skinUrlField.keyPressed(keyInput) || super.keyPressed(keyInput);
     }
 
     @Override
-    public boolean charTyped(CharInput charInput) {
+    public boolean charTyped(CharacterEvent charInput) {
         return nameField.charTyped(charInput) || skinUrlField.charTyped(charInput) || super.charTyped(charInput);
     }
 
     @Override
-    public boolean mouseClicked(Click click, boolean doubled) {
+    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         boolean nameFocused = nameField.mouseClicked(click, doubled);
         boolean skinFocused = skinUrlField.mouseClicked(click, doubled);
 
