@@ -3,32 +3,27 @@ package dev.majanito.utils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.UUID;
 
 public class APIUtils {
+    private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
+
     public static String[] getProfileInfo(String token) throws IOException {
         try {
-            CloseableHttpClient client = HttpClients.createDefault();
-            HttpGet request = new HttpGet("https://api.minecraftservices.com/minecraft/profile");
-            request.setHeader("Authorization", "Bearer " + token);
-            CloseableHttpResponse response = client.execute(request);
-            String jsonString = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-            JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://api.minecraftservices.com/minecraft/profile")).header("Authorization", "Bearer " + token).GET().build();
+            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
             String IGN = jsonObject.get("name").getAsString();
             String UUID = jsonObject.get("id").getAsString();
             return new String[] {IGN, UUID};
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
@@ -52,14 +47,12 @@ public class APIUtils {
 
     public static int changeSkin(String url, String token) {
         try {
-            CloseableHttpClient client = HttpClients.createDefault();
-            HttpPost request = new HttpPost("https://api.minecraftservices.com/minecraft/profile/skins");
-            request.setHeader("Authorization", "Bearer " + token);
-            request.setHeader("Content-Type", "application/json");
             String jsonString = String.format("{ \"variant\": \"classic\", \"url\": \"%s\"}", url);
-            request.setEntity(new StringEntity(jsonString));
-            CloseableHttpResponse response = client.execute(request);
-            return response.getStatusLine().getStatusCode();
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://api.minecraftservices.com/minecraft/profile/skins")).header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(jsonString)).build();
+
+            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.statusCode();
         } catch (Exception e) {
             return -1;
         }
@@ -67,11 +60,11 @@ public class APIUtils {
 
     public static int changeName(String newName, String token) {
         try {
-            CloseableHttpClient client = HttpClients.createDefault();
-            HttpPut request = new HttpPut("https://api.minecraftservices.com/minecraft/profile/name/" + newName);
-            request.setHeader("Authorization", "Bearer " + token);
-            CloseableHttpResponse response = client.execute(request);
-            return response.getStatusLine().getStatusCode();
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://api.minecraftservices.com/minecraft/profile/name/" + newName)).header("Authorization", "Bearer " + token)
+                    .PUT(HttpRequest.BodyPublishers.ofString("")).build();
+
+            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.statusCode();
         } catch (Exception e) {
             return -1;
         }
