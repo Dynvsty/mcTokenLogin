@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -29,10 +30,12 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo ci) {
-        int loginButtonX = this.width - 90;
-        int editAccountButtonX = this.width - 180;
-        int buttonY = 5;
-        int buttonWidth = 80;
+        boolean meteorInstalled = FabricLoader.getInstance().isModLoaded("meteor-client");
+
+        int loginButtonX = meteorInstalled ? (this.width - 155 - 77) : (this.width - 90);
+        int editAccountButtonX = meteorInstalled ? (this.width - 155 - 77 - 77) : (this.width - 90);
+        int buttonY = 3;
+        int buttonWidth = 75;
         int buttonHeight = 20;
 
         this.addRenderableWidget(Button.builder(Component.literal("Login"), button -> {
@@ -69,12 +72,8 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
         else
             statusText = Component.literal("[✘] Invalid").withStyle(ChatFormatting.RED);
 
-        Component display = Component
-            .literal("User: ")
-            .append(Component.literal(username).withStyle(ChatFormatting.WHITE))
-            .append(Component.literal(" | ")
-            .withStyle(ChatFormatting.DARK_GRAY))
-            .append(statusText);
+        Component display =
+                Component.literal("User: ").append(Component.literal(username).withStyle(ChatFormatting.WHITE)).append(Component.literal(" | ").withStyle(ChatFormatting.DARK_GRAY)).append(statusText);
 
         context.drawString(this.font, display, 5, 10, 0xFFFFFFFF, false);
     }
