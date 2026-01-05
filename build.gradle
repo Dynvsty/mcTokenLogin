@@ -28,6 +28,10 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.release = 21
 }
 
+tasks.named("wrapper", Wrapper) {
+	gradleVersion = "9.2.0"
+}
+
 java {
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21

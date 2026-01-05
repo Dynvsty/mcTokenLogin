@@ -17,7 +17,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
       - name: Build with Gradle
         run: |
-          sed -i 's/\r$//' gradlew
           chmod +x gradlew
           ./gradlew build
       - name: Upload Jar
