@@ -1,12 +1,12 @@
-package dev.majanito.utils;
+package xyz.villainsrule.utils;
 
-import dev.majanito.SessionIDLoginMod;
+import java.util.Optional;
+import java.util.UUID;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.User;
 
-import java.util.Optional;
-import java.util.UUID;
+import xyz.villainsrule.TokenLoginMod;
 
 public class SessionUtils {
     public static String getUsername() {
@@ -31,10 +31,10 @@ public class SessionUtils {
     }
 
     public static void setSession(User session) {
-        SessionIDLoginMod.currentSession = session;
+        TokenLoginMod.currentSession = session;
     }
 
     public static void restoreSession() {
-        SessionIDLoginMod.currentSession = SessionIDLoginMod.originalSession;
+        TokenLoginMod.currentSession = TokenLoginMod.originalSession;
     }
 }

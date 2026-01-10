@@ -1,10 +1,6 @@
-package dev.majanito.screens;
+package xyz.villainsrule.screens;
 
 import org.jspecify.annotations.NonNull;
-
-import dev.majanito.SessionIDLoginMod;
-import dev.majanito.utils.APIUtils;
-import dev.majanito.utils.SessionUtils;
 
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,6 +12,10 @@ import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
+
+import xyz.villainsrule.TokenLoginMod;
+import xyz.villainsrule.utils.APIUtils;
+import xyz.villainsrule.utils.SessionUtils;
 
 public class EditAccountScreen extends Screen {
     private EditBox nameField;
@@ -47,10 +47,10 @@ public class EditAccountScreen extends Screen {
             String newName = nameField.getValue().trim();
             if (!newName.isEmpty()) {
                 if (newName.matches("^[a-zA-Z0-9_]{3,16}$")) {
-                    int statusCode = APIUtils.changeName(newName, SessionIDLoginMod.currentSession.getAccessToken());
+                    int statusCode = APIUtils.changeName(newName, TokenLoginMod.currentSession.getAccessToken());
                     currentTitle = switch (statusCode) {
                         case 200 -> {
-                            SessionIDLoginMod.currentSession = SessionUtils.createSession(newName, SessionIDLoginMod.currentSession.getProfileId(), SessionIDLoginMod.currentSession.getAccessToken());
+                            TokenLoginMod.currentSession = SessionUtils.createSession(newName, TokenLoginMod.currentSession.getProfileId(), TokenLoginMod.currentSession.getAccessToken());
                             yield Component.literal("Successfully changed name").withStyle(ChatFormatting.GREEN);
                         }
                         case 429 -> Component.literal("Too many requests").withStyle(ChatFormatting.RED);
@@ -70,7 +70,7 @@ public class EditAccountScreen extends Screen {
         skinButton = Button.builder(Component.literal("Change Skin"), button -> {
             String skinUrl = skinUrlField.getValue().trim();
             if (!skinUrl.isEmpty()) {
-                int statusCode = APIUtils.changeSkin(skinUrl, SessionIDLoginMod.currentSession.getAccessToken());
+                int statusCode = APIUtils.changeSkin(skinUrl, TokenLoginMod.currentSession.getAccessToken());
                 currentTitle = switch (statusCode) {
                     case 200 -> Component.literal("Successfully changed skin").withStyle(ChatFormatting.GREEN);
                     case 429 -> Component.literal("Too many requests").withStyle(ChatFormatting.RED);
@@ -90,7 +90,7 @@ public class EditAccountScreen extends Screen {
 
         this.addRenderableWidget(backButton);
 
-        if (SessionIDLoginMod.originalSession.equals(SessionIDLoginMod.currentSession)) {
+        if (TokenLoginMod.originalSession.equals(TokenLoginMod.currentSession)) {
             nameButton.active = false;
             skinButton.active = false;
 

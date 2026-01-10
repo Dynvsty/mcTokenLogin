@@ -1,8 +1,9 @@
-package dev.majanito.screens;
+package xyz.villainsrule.screens;
 
-import dev.majanito.SessionIDLoginMod;
-import dev.majanito.utils.APIUtils;
-import dev.majanito.utils.SessionUtils;
+import java.io.IOException;
+
+import org.jspecify.annotations.NonNull;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -13,9 +14,9 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 
-import java.io.IOException;
-
-import org.jspecify.annotations.NonNull;
+import xyz.villainsrule.TokenLoginMod;
+import xyz.villainsrule.utils.APIUtils;
+import xyz.villainsrule.utils.SessionUtils;
 
 public class LoginScreen extends Screen {
     private EditBox sessionField;
@@ -75,7 +76,7 @@ public class LoginScreen extends Screen {
         }).bounds(centerX - 100, centerY + 50, 200, 20).build();
         this.addRenderableWidget(backButton);
 
-        if (SessionIDLoginMod.currentSession.equals(SessionIDLoginMod.originalSession))
+        if (TokenLoginMod.currentSession.equals(TokenLoginMod.originalSession))
             restoreButton.active = false;
     }
 

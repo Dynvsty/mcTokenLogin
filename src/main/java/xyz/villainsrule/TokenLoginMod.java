@@ -1,14 +1,16 @@
-package dev.majanito;
+package xyz.villainsrule;
 
-import dev.majanito.utils.SessionUtils;
-import net.fabricmc.api.ModInitializer;
-
-import net.minecraft.client.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SessionIDLoginMod implements ModInitializer {
-    public static final String MOD_ID = "session-id-login-mod";
+import net.minecraft.client.User;
+
+import net.fabricmc.api.ModInitializer;
+
+import xyz.villainsrule.utils.SessionUtils;
+
+public class TokenLoginMod implements ModInitializer {
+    public static final String MOD_ID = "tklogin";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     public static User originalSession;

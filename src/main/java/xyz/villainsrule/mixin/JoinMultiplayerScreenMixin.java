@@ -1,9 +1,12 @@
-package dev.majanito.mixin;
+package xyz.villainsrule.mixin;
 
-import dev.majanito.screens.EditAccountScreen;
-import dev.majanito.screens.LoginScreen;
-import dev.majanito.utils.APIUtils;
-import dev.majanito.utils.SessionUtils;
+import org.jspecify.annotations.NonNull;
+
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -14,13 +17,10 @@ import net.minecraft.ChatFormatting;
 
 import net.fabricmc.loader.api.FabricLoader;
 
-import org.jspecify.annotations.NonNull;
-
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xyz.villainsrule.screens.EditAccountScreen;
+import xyz.villainsrule.screens.LoginScreen;
+import xyz.villainsrule.utils.APIUtils;
+import xyz.villainsrule.utils.SessionUtils;
 
 @Mixin(JoinMultiplayerScreen.class)
 public abstract class JoinMultiplayerScreenMixin extends Screen {

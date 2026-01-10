@@ -1,26 +1,26 @@
 {
 	"schemaVersion": 1,
-	"id": "session-id-login-mod",
+	"id": "tklogin",
 	"version": "${version}",
 	"name": "1.21 Token Login",
-	"description": "A lightweight Fabric client-side mod that adds a GUI to log in using Minecraft access tokens. Includes a status display (Valid/Invalid) and integrates cleanly into the multiplayer menu without affecting gameplay or server-side behavior.",
+	"description": "a Fabric mod for 1.21+ that allows you to easily login with access tokens.",
 	"authors": [
-		"Majanito"
+		"VillainsRule"
 	],
 	"contact": {
 		"homepage": "None",
 		"sources": "https://github.com/VillainsRule/1.21TokenLogin"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/session-id-login-mod/icon.png",
+	"icon": "assets/tklogin/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"dev.majanito.SessionIDLoginMod"
+			"xyz.villainsrule.TokenLoginMod"
 		]
 	},
 	"mixins": [
-		"session-id-login-mod.mixins.json"
+		"tklogin.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.16.10",
