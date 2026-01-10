@@ -4,13 +4,18 @@ import dev.majanito.screens.EditAccountScreen;
 import dev.majanito.screens.LoginScreen;
 import dev.majanito.utils.APIUtils;
 import dev.majanito.utils.SessionUtils;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
+
+import net.fabricmc.loader.api.FabricLoader;
+
+import org.jspecify.annotations.NonNull;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -50,8 +55,9 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
         hasValidationStarted = false;
     }
 
+    @SuppressWarnings("null")
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void render(@NonNull GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
         String username = SessionUtils.getUsername();

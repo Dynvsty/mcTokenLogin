@@ -15,6 +15,8 @@ import net.minecraft.ChatFormatting;
 
 import java.io.IOException;
 
+import org.jspecify.annotations.NonNull;
+
 public class LoginScreen extends Screen {
     private EditBox sessionField;
     private Button loginButton;
@@ -77,8 +79,9 @@ public class LoginScreen extends Screen {
             restoreButton.active = false;
     }
 
+    @SuppressWarnings("null")
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void render(@NonNull GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
         sessionField.render(context, mouseX, mouseY, delta);
@@ -87,7 +90,7 @@ public class LoginScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent keyInput) {
+    public boolean keyPressed(@NonNull KeyEvent keyInput) {
         if (sessionField.keyPressed(keyInput) || sessionField.isActive())
             return true;
 
@@ -95,7 +98,7 @@ public class LoginScreen extends Screen {
     }
 
     @Override
-    public boolean charTyped(CharacterEvent charInput) {
+    public boolean charTyped(@NonNull CharacterEvent charInput) {
         if (sessionField.charTyped(charInput))
             return true;
 

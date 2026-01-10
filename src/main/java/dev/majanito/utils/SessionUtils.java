@@ -1,6 +1,7 @@
 package dev.majanito.utils;
 
 import dev.majanito.SessionIDLoginMod;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.User;
 
@@ -16,6 +17,7 @@ public class SessionUtils {
         return Minecraft.getInstance().getUser();
     }
 
+    @SuppressWarnings("null")
     public static User createSession(String username, String uuidString, String ssid) {
         if (uuidString.length() == 32)
             uuidString = uuidString.substring(0, 8) + "-" + uuidString.substring(8, 12) + "-" + uuidString.substring(12, 16) + "-" + uuidString.substring(16, 20) + "-" + uuidString.substring(20);
@@ -23,6 +25,7 @@ public class SessionUtils {
         return new User(username, UUID.fromString(uuidString), ssid, Optional.empty(), Optional.empty());
     }
 
+    @SuppressWarnings("null")
     public static User createSession(String username, UUID uuid, String ssid) {
         return new User(username, uuid, ssid, Optional.empty(), Optional.empty());
     }

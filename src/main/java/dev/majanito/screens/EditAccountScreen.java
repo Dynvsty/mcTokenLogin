@@ -1,8 +1,11 @@
 package dev.majanito.screens;
 
+import org.jspecify.annotations.NonNull;
+
 import dev.majanito.SessionIDLoginMod;
 import dev.majanito.utils.APIUtils;
 import dev.majanito.utils.SessionUtils;
+
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -95,8 +98,9 @@ public class EditAccountScreen extends Screen {
         }
     }
 
+    @SuppressWarnings("null")
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void render(@NonNull GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
         context.drawString(this.font, Component.literal("Username:"), this.width / 2 - 100, this.height / 2 - 52, 0xA0A0A0FF);
@@ -109,17 +113,17 @@ public class EditAccountScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent keyInput) {
+    public boolean keyPressed(@NonNull KeyEvent keyInput) {
         return nameField.keyPressed(keyInput) || skinUrlField.keyPressed(keyInput) || super.keyPressed(keyInput);
     }
 
     @Override
-    public boolean charTyped(CharacterEvent charInput) {
+    public boolean charTyped(@NonNull CharacterEvent charInput) {
         return nameField.charTyped(charInput) || skinUrlField.charTyped(charInput) || super.charTyped(charInput);
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
+    public boolean mouseClicked(@NonNull MouseButtonEvent click, boolean doubled) {
         boolean nameFocused = nameField.mouseClicked(click, doubled);
         boolean skinFocused = skinUrlField.mouseClicked(click, doubled);
 

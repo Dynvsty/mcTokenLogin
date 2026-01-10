@@ -1,8 +1,10 @@
 package dev.majanito.mixin;
 
 import dev.majanito.SessionIDLoginMod;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.User;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
