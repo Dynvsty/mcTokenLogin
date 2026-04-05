@@ -2,14 +2,14 @@
 	"schemaVersion": 1,
 	"id": "tklogin",
 	"version": "${version}",
-	"name": "1.21 Token Login",
-	"description": "a Fabric mod for 1.21+ that allows you to easily login with access tokens.",
+	"name": "MC Token Login",
+	"description": "a Fabric mod for 26.1+ that allows you to easily login with access tokens.",
 	"authors": [
 		"VillainsRule"
 	],
 	"contact": {
 		"homepage": "None",
-		"sources": "https://github.com/VillainsRule/1.21TokenLogin"
+		"sources": "https://github.com/VillainsRule/mcTokenLogin"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/tklogin/icon.png",
@@ -24,7 +24,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.16.10",
-		"minecraft": ">=1.21.9",
-		"java": ">=21"
+		"minecraft": ">=26.1",
+		"java": ">=25"
 	}
 }

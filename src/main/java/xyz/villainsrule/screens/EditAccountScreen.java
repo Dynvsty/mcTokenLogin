@@ -3,7 +3,7 @@ package xyz.villainsrule.screens;
 import org.jspecify.annotations.NonNull;
 
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.components.Button;
@@ -100,16 +100,16 @@ public class EditAccountScreen extends Screen {
 
     @SuppressWarnings("null")
     @Override
-    public void render(@NonNull GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+    public void extractRenderState(@NonNull GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
 
-        context.drawString(this.font, Component.literal("Username:"), this.width / 2 - 100, this.height / 2 - 52, 0xA0A0A0FF);
-        nameField.render(context, mouseX, mouseY, delta);
+        context.text(this.font, Component.literal("Username:"), this.width / 2 - 100, this.height / 2 - 52, 0xA0A0A0FF);
+        nameField.extractRenderState(context, mouseX, mouseY, delta);
 
-        context.drawString(this.font, Component.literal("Skin URL:"), this.width / 2 - 100, this.height / 2 - 10, 0xA0A0A0FF);
-        skinUrlField.render(context, mouseX, mouseY, delta);
+        context.text(this.font, Component.literal("Skin URL:"), this.width / 2 - 100, this.height / 2 - 10, 0xA0A0A0FF);
+        skinUrlField.extractRenderState(context, mouseX, mouseY, delta);
 
-        context.drawCenteredString(this.font, this.currentTitle, this.width / 2, this.height / 2 - 75, 0xFFFFFFFF);
+        context.centeredText(this.font, this.currentTitle, this.width / 2, this.height / 2 - 75, 0xFFFFFFFF);
     }
 
     @Override

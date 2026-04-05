@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.components.Button;
@@ -37,11 +37,23 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
     private void onInit(CallbackInfo ci) {
         boolean meteorInstalled = FabricLoader.getInstance().isModLoaded("meteor-client");
 
-        int loginButtonX = meteorInstalled ? (this.width - 155 - 77) : (this.width - 90);
-        int editAccountButtonX = meteorInstalled ? (this.width - 155 - 77 - 77) : (this.width - 90);
         int buttonY = 3;
         int buttonWidth = 75;
         int buttonHeight = 20;
+        int spacing = 2;
+        int rightMargin = 5;
+
+        int loginButtonX;
+        int editAccountButtonX;
+
+        if (meteorInstalled) {
+            int meteorOffset = 77;
+            loginButtonX = this.width - rightMargin - buttonWidth - meteorOffset;
+            editAccountButtonX = loginButtonX - buttonWidth - spacing;
+        } else {
+            loginButtonX = this.width - rightMargin - buttonWidth;
+            editAccountButtonX = loginButtonX - buttonWidth - spacing;
+        }
 
         this.addRenderableWidget(Button.builder(Component.literal("Login"), button -> {
             this.minecraft.setScreen(new LoginScreen());
@@ -57,8 +69,8 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
 
     @SuppressWarnings("null")
     @Override
-    public void render(@NonNull GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+    public void extractRenderState(@NonNull GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
 
         String username = SessionUtils.getUsername();
 
@@ -81,6 +93,6 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
         Component display =
                 Component.literal("User: ").append(Component.literal(username).withStyle(ChatFormatting.WHITE)).append(Component.literal(" | ").withStyle(ChatFormatting.DARK_GRAY)).append(statusText);
 
-        context.drawString(this.font, display, 5, 10, 0xFFFFFFFF, false);
+        context.text(this.font, display, 5, 10, 0xFFFFFFFF, false);
     }
 }

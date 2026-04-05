@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.jspecify.annotations.NonNull;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.components.Button;
@@ -82,12 +82,12 @@ public class LoginScreen extends Screen {
 
     @SuppressWarnings("null")
     @Override
-    public void render(@NonNull GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+    public void extractRenderState(@NonNull GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
 
-        sessionField.render(context, mouseX, mouseY, delta);
+        sessionField.extractRenderState(context, mouseX, mouseY, delta);
 
-        context.drawCenteredString(this.font, this.currentTitle, this.width / 2, this.height / 2 - 30, 0xFFFFFFFF);
+        context.centeredText(this.font, this.currentTitle, this.width / 2, this.height / 2 - 30, 0xFFFFFFFF);
     }
 
     @Override
