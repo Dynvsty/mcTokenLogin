@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
@@ -20,7 +21,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import xyz.villainsrule.screens.EditAccountScreen;
 import xyz.villainsrule.screens.LoginScreen;
 import xyz.villainsrule.utils.APIUtils;
-import xyz.villainsrule.utils.SessionUtils;
 
 @Mixin(JoinMultiplayerScreen.class)
 public abstract class JoinMultiplayerScreenMixin extends Screen {
@@ -67,12 +67,11 @@ public abstract class JoinMultiplayerScreenMixin extends Screen {
         hasValidationStarted = false;
     }
 
-    @SuppressWarnings("null")
     @Override
     public void extractRenderState(@NonNull GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         super.extractRenderState(context, mouseX, mouseY, delta);
 
-        String username = SessionUtils.getUsername();
+        String username = Minecraft.getInstance().getUser().getName();
 
         if (isSessionValid == null && !hasValidationStarted) {
             hasValidationStarted = true;

@@ -1,22 +1,23 @@
 package xyz.villainsrule.utils;
 
+import java.net.Proxy;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.mojang.authlib.Environment;
+import com.mojang.authlib.minecraft.MinecraftSessionService;
+import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
+import com.mojang.authlib.yggdrasil.YggdrasilEnvironment;
+import com.mojang.authlib.yggdrasil.YggdrasilUserApiService;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.User;
+import net.minecraft.client.multiplayer.ProfileKeyPairManager;
+import net.minecraft.server.Services;
 
 import xyz.villainsrule.TokenLoginMod;
 
 public class SessionUtils {
-    public static String getUsername() {
-        return Minecraft.getInstance().getUser().getName();
-    }
-
-    public static User getSession() {
-        return Minecraft.getInstance().getUser();
-    }
-
     @SuppressWarnings("null")
     public static User createSession(String username, String uuidString, String ssid) {
         if (uuidString.length() == 32)
@@ -30,11 +31,26 @@ public class SessionUtils {
         return new User(username, uuid, ssid, Optional.empty(), Optional.empty());
     }
 
+    @SuppressWarnings("null")
     public static void setSession(User session) {
         TokenLoginMod.currentSession = session;
+
+        Environment environment = YggdrasilEnvironment.PROD.getEnvironment();
+        YggdrasilAuthenticationService authService = new YggdrasilAuthenticationService(Proxy.NO_PROXY, environment);
+        MinecraftSessionService sessionService = authService.createMinecraftSessionService();
+
+        YggdrasilUserApiService userAuthenticationService = new YggdrasilUserApiService(session.getAccessToken(), Proxy.NO_PROXY, environment);
+        ProfileKeyPairManager keys = ProfileKeyPairManager.create(userAuthenticationService, session, Minecraft.getInstance().gameDirectory.toPath());
+        Services mcServices = new Services(sessionService, authService.getServicesKeySet(), authService.createProfileRepository(), Minecraft.getInstance().services().nameToIdCache(),
+                Minecraft.getInstance().services().profileResolver());
+
+        TokenLoginMod.currentServices = mcServices;
+        TokenLoginMod.currentKeyPairManager = keys;
     }
 
     public static void restoreSession() {
-        TokenLoginMod.currentSession = TokenLoginMod.originalSession;
+        TokenLoginMod.currentSession = TokenLoginMod.restorableSession;
+        TokenLoginMod.currentServices = TokenLoginMod.restorableServices;
+        TokenLoginMod.currentKeyPairManager = TokenLoginMod.restorableKeyPairManager;
     }
 }

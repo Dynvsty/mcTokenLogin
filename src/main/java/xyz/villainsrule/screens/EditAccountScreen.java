@@ -90,7 +90,7 @@ public class EditAccountScreen extends Screen {
 
         this.addRenderableWidget(backButton);
 
-        if (TokenLoginMod.originalSession.equals(TokenLoginMod.currentSession)) {
+        if (TokenLoginMod.restorableSession.equals(TokenLoginMod.currentSession)) {
             nameButton.active = false;
             skinButton.active = false;
 

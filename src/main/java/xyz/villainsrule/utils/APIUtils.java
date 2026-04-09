@@ -15,14 +15,16 @@ import net.minecraft.client.Minecraft;
 public class APIUtils {
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
 
-    public static String[] getProfileInfo(String token) throws IOException {
+    public record ProfileInfo(String ign, String uuid) {
+    }
+
+    public static ProfileInfo getProfileInfo(String token) throws IOException {
         try {
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://api.minecraftservices.com/minecraft/profile")).header("Authorization", "Bearer " + token).GET().build();
             HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
-            String IGN = jsonObject.get("name").getAsString();
-            String UUID = jsonObject.get("id").getAsString();
-            return new String[] {IGN, UUID};
+            JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
+
+            return new ProfileInfo(json.get("name").getAsString(), json.get("id").getAsString());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -30,17 +32,11 @@ public class APIUtils {
 
     public static Boolean validateSession(String token) {
         try {
-            String[] profileInfo = getProfileInfo(token);
-            String ign = profileInfo[0];
-            String uuidString = profileInfo[1];
+            ProfileInfo profileInfo = getProfileInfo(token);
+            String fixedUUID = profileInfo.uuid.length() == 32 ? profileInfo.uuid.substring(0, 8) + "-" + profileInfo.uuid.substring(8, 12) + "-" + profileInfo.uuid.substring(12, 16) + "-" + profileInfo.uuid.substring(16, 20) + "-" + profileInfo.uuid.substring(20) : profileInfo.uuid;
+            UUID uuid = UUID.fromString(fixedUUID);
 
-            if (uuidString.length() == 32) {
-                uuidString = uuidString.substring(0, 8) + "-" + uuidString.substring(8, 12) + "-" + uuidString.substring(12, 16) + "-" + uuidString.substring(16, 20) + "-" + uuidString.substring(20);
-            }
-
-            UUID uuid = UUID.fromString(uuidString);
-
-            return ign.equals(Minecraft.getInstance().getUser().getName()) && uuid.equals(Minecraft.getInstance().getUser().getProfileId());
+            return profileInfo.ign.equals(Minecraft.getInstance().getUser().getName()) && uuid.equals(Minecraft.getInstance().getUser().getProfileId());
         } catch (Exception e) {
             return false;
         }
