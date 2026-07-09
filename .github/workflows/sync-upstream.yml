@@ -33,11 +33,12 @@ jobs:
           git remote add upstream "$UPSTREAM_URL"
           git fetch upstream --prune
 
-          UPDATED=()
+          ALL=()
           for ref in $(git for-each-ref --format='%(refname:short)' refs/remotes/upstream); do
             branch="${ref#upstream/}"
             [ "$branch" = "HEAD" ] && continue
             echo "== $branch =="
+            ALL+=("\"$branch\"")
 
             if git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
               git checkout -B "$branch" "origin/$branch"
@@ -45,7 +46,6 @@ jobs:
               echo "New upstream branch, creating on fork"
               git checkout -B "$branch" "upstream/$branch"
               git push origin "$branch"
-              UPDATED+=("\"$branch\"")
               continue
             fi
 
@@ -54,20 +54,15 @@ jobs:
               continue
             fi
 
-            BEFORE=$(git rev-parse HEAD)
             if git merge --ff-only "upstream/$branch"; then
-              AFTER=$(git rev-parse HEAD)
-              if [ "$BEFORE" != "$AFTER" ]; then
-                git push origin "$branch"
-                UPDATED+=("\"$branch\"")
-              fi
+              git push origin "$branch"
             else
               echo "::warning::$branch has diverged from upstream and could not be fast-forwarded; skipping"
             fi
           done
 
-          JSON="[$(IFS=,; echo "${UPDATED[*]}")]"
-          echo "Updated branches: $JSON"
+          JSON="[$(IFS=,; echo "${ALL[*]}")]"
+          echo "All branches: $JSON"
           echo "branches=$JSON" >> "$GITHUB_OUTPUT"
 
   build:
