@@ -34,9 +34,7 @@ jobs:
           git fetch upstream --prune
 
           ALL=()
-          for ref in $(git for-each-ref --format='%(refname:short)' refs/remotes/upstream); do
-            branch="${ref#upstream/}"
-            [ "$branch" = "HEAD" ] && continue
+          for branch in $(git ls-remote --heads upstream | awk '{print $2}' | sed 's#refs/heads/##'); do
             echo "== $branch =="
             ALL+=("\"$branch\"")
 
