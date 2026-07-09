@@ -1,0 +1,124 @@
+name: Sync upstream and build
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+env:
+  UPSTREAM_URL: https://github.com/VillainsDrool/mcTokenLogin.git
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    outputs:
+      branches: ${{ steps.sync.outputs.branches }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync all branches from upstream
+        id: sync
+        run: |
+          set -e
+          git remote add upstream "$UPSTREAM_URL"
+          git fetch upstream --prune
+
+          UPDATED=()
+          for ref in $(git for-each-ref --format='%(refname:short)' refs/remotes/upstream); do
+            branch="${ref#upstream/}"
+            [ "$branch" = "HEAD" ] && continue
+            echo "== $branch =="
+
+            if git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+              git checkout -B "$branch" "origin/$branch"
+            else
+              echo "New upstream branch, creating on fork"
+              git checkout -B "$branch" "upstream/$branch"
+              git push origin "$branch"
+              UPDATED+=("\"$branch\"")
+              continue
+            fi
+
+            if git merge-base --is-ancestor "upstream/$branch" HEAD; then
+              echo "$branch already up to date"
+              continue
+            fi
+
+            BEFORE=$(git rev-parse HEAD)
+            if git merge --ff-only "upstream/$branch"; then
+              AFTER=$(git rev-parse HEAD)
+              if [ "$BEFORE" != "$AFTER" ]; then
+                git push origin "$branch"
+                UPDATED+=("\"$branch\"")
+              fi
+            else
+              echo "::warning::$branch has diverged from upstream and could not be fast-forwarded; skipping"
+            fi
+          done
+
+          JSON="[$(IFS=,; echo "${UPDATED[*]}")]"
+          echo "Updated branches: $JSON"
+          echo "branches=$JSON" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: sync
+    if: needs.sync.outputs.branches != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: ${{ fromJson(needs.sync.outputs.branches) }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ matrix.branch }}
+
+      - name: Detect required Java version
+        id: javaver
+        run: |
+          VER=$(grep -oP 'release\s*=\s*\K[0-9]+' build.gradle | head -1)
+          if [ -z "$VER" ]; then VER=21; fi
+          echo "Detected Java $VER"
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ steps.javaver.outputs.version }}
+
+      - name: Verify Gradle
+        uses: gradle/actions/wrapper-validation@v5
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Build with Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew build
+
+      - name: Upload Jar
+        uses: actions/upload-artifact@v5.0.0
+        with:
+          name: TokenLogin-${{ matrix.branch }}
+          path: build/libs/*.jar
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: sync-${{ matrix.branch }}-${{ github.run_number }}
+          name: "${{ matrix.branch }} auto-sync build #${{ github.run_number }}"
+          files: build/libs/*.jar
